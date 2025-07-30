@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Seçimi - AERA</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background-color: #fef9f4;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+    }
+
+    h1 {
+      color: #4a3b2c;
+      margin-bottom: 40px;
+    }
+
+    .butonlar {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    button {
+      padding: 16px 24px;
+      font-size: 18px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      width: 220px;
+      background-color: #4a3b2c;
+      color: white;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #3a2c20;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Hoş geldin, Admin!</h1>
+
+  <div class="butonlar">
+    <button onclick="window.location.href='admin.html'">🛠 Admin Paneli</button>
+    <button onclick="window.location.href='anasayfa.html'">🏠 Ana Sayfa</button>
+  </div>
+
+</body>
+</html>

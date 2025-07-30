@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>AERA Açılış</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #FAF2E9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    h1 {
+      font-size: 64px;
+      font-weight: bold;
+      color: #252525;
+      animation: fadeInOut 3s ease-in-out forwards;
+      letter-spacing: 4px;
+    }
+
+    @keyframes fadeInOut {
+      0% { opacity: 0; transform: scale(0.95); }
+      10% { opacity: 1; transform: scale(1); }
+      90% { opacity: 1; transform: scale(1); }
+      100% { opacity: 0; transform: scale(1.05); }
+    }
+  </style>
+</head>
+<body>
+  <h1>AERA</h1>
+
+  <script>
+    setTimeout(() => {
+      window.location.href = "giris.html";
+    }, 3000); // 3 saniye sonra giris.html'e yönlendirme
+  </script>
+</body>
+</html>

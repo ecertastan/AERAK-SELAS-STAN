@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Not Oku - AERA</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Georgia', serif;
+      background-color: #fffaf3;
+      padding: 20px;
+      margin: 0;
+      color: #4a3b2c;
+    }
+
+    h1 {
+      text-align: center;
+      color: #fa5f1a;
+    }
+
+    #tarih {
+      text-align: center;
+      font-size: 18px;
+      margin-bottom: 20px;
+    }
+
+    #notMetni {
+      background-color: #fef1dc;
+      border: 1px solid #e6d3b3;
+      padding: 20px;
+      border-radius: 10px;
+      white-space: pre-wrap;
+      min-height: 200px;
+      font-size: 16px;
+      font-family: 'Georgia', serif;
+    }
+
+    .butonlar {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .butonlar button {
+      background-color: #4a3b2c;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .butonlar button:hover {
+      background-color: #3a2c20;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>AERA Not</h1>
+  <div id="tarih"></div>
+  <div id="notMetni">Yükleniyor...</div>
+
+  <div class="butonlar">
+    <button id="silBtn">Notu Sil</button>
+    <button id="duzenleBtn">Notu Düzenle</button>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const gun = params.get("gun");
+    const ay = params.get("ay");
+    const yil = params.get("yil");
+    const seciliTarih = `${yil}-${ay.padStart(2, '0')}-${gun.padStart(2, '0')}`;
+    const aktifKullanici = localStorage.getItem("aktifKullanici");
+
+    const tarihMetni = new Date(seciliTarih).toLocaleDateString("tr-TR", { day: 'numeric', month: 'long', year: 'numeric' });
+    document.getElementById("tarih").textContent = tarihMetni;
+
+    const notlar = JSON.parse(localStorage.getItem("notlar") || "[]");
+    const notObj = notlar.find(n => n.tarih === seciliTarih && n.kullanici === aktifKullanici);
+
+    const notMetni = document.getElementById("notMetni");
+    if (notObj) {
+      notMetni.textContent = notObj.metin;
+    } else {
+      notMetni.textContent = "Bu tarih için not bulunamadı.";
+      document.getElementById("silBtn").style.display = "none";
+      document.getElementById("duzenleBtn").style.display = "none";
+    }
+
+    document.getElementById("silBtn").onclick = () => {
+      const guncelNotlar = notlar.filter(n => !(n.tarih === seciliTarih && n.kullanici === aktifKullanici));
+      localStorage.setItem("notlar", JSON.stringify(guncelNotlar));
+      alert("Not silindi.");
+      window.location.href = `not-ekle.html?gun=${gun}&ay=${ay}&yil=${yil}`;
+    };
+
+    document.getElementById("duzenleBtn").onclick = () => {
+      window.location.href = `not-ekle.html?gun=${gun}&ay=${ay}&yil=${yil}`;
+    };
+  </script>
+
+</body>
+</html>

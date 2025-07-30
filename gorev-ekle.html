@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Görev Ekle - AERA</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #fef9f4;
+      color: #252525;
+      padding: 20px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #fa5f1a;
+      margin-bottom: 30px;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    button {
+      margin-top: 25px;
+      width: 100%;
+      padding: 12px;
+      background-color: #4a3b2c;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #3a2c20;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Yeni Görev Ekle</h2>
+
+  <form id="gorevForm">
+    <label for="ad">Görev Adı</label>
+    <input type="text" id="ad" required>
+
+    <label for="saat">Saat</label>
+    <input type="time" id="saat" required>
+
+    <label for="sure">Süre (dakika)</label>
+    <input type="number" id="sure" min="1" required>
+
+    <label for="tekrar">Tekrar</label>
+    <select id="tekrar">
+      <option value="tek">Tek Seferlik</option>
+      <option value="gunluk">Günlük</option>
+      <option value="haftalik">Haftalık</option>
+    </select>
+
+    <label for="renk">Renk</label>
+    <input type="color" id="renk" value="#6b4f3b">
+
+    <button type="submit">Kaydet</button>
+  </form>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const gun = params.get("gun");
+    const ay = params.get("ay");
+    const yil = params.get("yil");
+
+    const aktifKullanici = localStorage.getItem("aktifKullanici");
+
+    document.getElementById("gorevForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      if (!aktifKullanici) {
+        alert("Oturum açılmamış. Lütfen giriş yapın.");
+        return;
+      }
+
+      const gorev = {
+        ad: document.getElementById("ad").value,
+        saat: document.getElementById("saat").value,
+        sure: parseInt(document.getElementById("sure").value),
+        tekrar: document.getElementById("tekrar").value,
+        renk: document.getElementById("renk").value,
+        tarih: `${yil}-${ay.padStart(2, '0')}-${gun.padStart(2, '0')}`,
+        kullanici: aktifKullanici
+      };
+
+      let gorevler = JSON.parse(localStorage.getItem("gorevler") || "[]");
+
+      if (gorev.tekrar === "gunluk") {
+        for (let i = 0; i < 30; i++) {
+          const tarih = new Date(gorev.tarih);
+          tarih.setDate(tarih.getDate() + i);
+          const yeniGorev = { ...gorev, tarih: tarih.toISOString().split('T')[0] };
+          gorevler.push(yeniGorev);
+        }
+      } else if (gorev.tekrar === "haftalik") {
+        for (let i = 0; i < 12; i++) {
+          const tarih = new Date(gorev.tarih);
+          tarih.setDate(tarih.getDate() + i * 7);
+          const yeniGorev = { ...gorev, tarih: tarih.toISOString().split('T')[0] };
+          gorevler.push(yeniGorev);
+        }
+      } else {
+        gorevler.push(gorev); // Tek seferlik görev
+      }
+
+      localStorage.setItem("gorevler", JSON.stringify(gorevler));
+      window.location.href = "anasayfa.html";
+    });
+  </script>
+
+</body>
+</html>

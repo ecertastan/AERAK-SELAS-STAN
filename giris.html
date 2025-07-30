@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Giriş Yap - AERA</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #fef9f4;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .giris-kutu {
+      background-color: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      width: 300px;
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      color: #fa5f1a;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 12px;
+      background-color: #4a3b2c;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #3a2c20;
+    }
+
+    .kayit-link {
+      margin-top: 15px;
+      font-size: 14px;
+      display: block;
+      color: #252525;
+    }
+
+    .kayit-link:hover {
+      text-decoration: underline;
+      color: #fa5f1a;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="giris-kutu">
+    <h2>Giriş Yap</h2>
+    <input type="email" id="email" placeholder="E-posta" required>
+    <input type="password" id="sifre" placeholder="Şifre" required>
+    <button onclick="girisYap()">Giriş</button>
+    <a class="kayit-link" href="kayit-ol.html">Hesabınız yok mu? Kaydolun</a>
+  </div>
+
+  <script>
+    function girisYap() {
+      const email = document.getElementById("email").value;
+      const sifre = document.getElementById("sifre").value;
+
+      let kullanicilar = JSON.parse(localStorage.getItem("kullanicilar") || "[]");
+
+      const eslesen = kullanicilar.find(k => k.email === email && k.sifre === sifre);
+
+      if (eslesen) {
+        localStorage.setItem("aktifKullanici", email);
+        if (email === "denizcan998@hotmail.com") {
+          localStorage.setItem("aktifRol", "admin");
+          window.location.href = "admin-giris-secim.html";
+        } else {
+          localStorage.setItem("aktifRol", "kullanici");
+          window.location.href = "anasayfa.html";
+        }
+      } else {
+        alert("E-posta veya şifre hatalı!");
+      }
+    }
+  </script>
+
+</body>
+</html>

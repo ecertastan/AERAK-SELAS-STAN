@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Kayıt Ol - AERA</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #fef9f4;
+      color: #252525;
+      padding: 20px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #fa5f1a;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    button {
+      margin-top: 25px;
+      width: 100%;
+      padding: 12px;
+      background-color: #4a3b2c;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #3a2c20;
+    }
+
+    .hata {
+      color: red;
+      margin-top: 10px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Kayıt Ol</h2>
+
+  <form id="kayitForm">
+    <label for="ad">Ad</label>
+    <input type="text" id="ad" required>
+
+    <label for="soyad">Soyad</label>
+    <input type="text" id="soyad" required>
+
+    <label for="yas">Yaş</label>
+    <input type="number" id="yas" required>
+
+    <label for="cinsiyet">Cinsiyet</label>
+    <select id="cinsiyet" required>
+      <option value="">Seçin</option>
+      <option value="Kadın">Kadın</option>
+      <option value="Erkek">Erkek</option>
+      <option value="Belirtmek istemiyorum">Belirtmek istemiyorum</option>
+    </select>
+
+    <label for="email">E-posta</label>
+    <input type="text" id="email" required>
+
+    <label for="sifre">Şifre</label>
+    <input type="password" id="sifre" required>
+
+    <button type="submit">Kayıt Ol</button>
+    <div class="hata" id="hataMesaji"></div>
+  </form>
+
+  <script>
+    document.getElementById("kayitForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const ad = document.getElementById("ad").value.trim();
+      const soyad = document.getElementById("soyad").value.trim();
+      const yas = document.getElementById("yas").value.trim();
+      const cinsiyet = document.getElementById("cinsiyet").value;
+      const email = document.getElementById("email").value.trim().toLowerCase();
+      const sifre = document.getElementById("sifre").value;
+
+      let kullanicilar = JSON.parse(localStorage.getItem("kullanicilar") || "[]");
+
+      const ayniMail = kullanicilar.find(k => k.email === email);
+      if (ayniMail) {
+        document.getElementById("hataMesaji").textContent = "Bu e-posta ile zaten kayıt olunmuş.";
+        return;
+      }
+
+      const yeniKullanici = { ad, soyad, yas, cinsiyet, email, sifre };
+      kullanicilar.push(yeniKullanici);
+      localStorage.setItem("kullanicilar", JSON.stringify(kullanicilar));
+
+      window.location.href = "ara-sayfa.html";
+    });
+  </script>
+</body>
+</html>

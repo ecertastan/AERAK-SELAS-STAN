@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Paneli - AERA</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #fef9f4;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h2 {
+      color: #fa5f1a;
+      cursor: pointer;
+    }
+
+    select, .kullanici-bilgileri, button {
+      display: block;
+      margin-top: 15px;
+      font-size: 16px;
+    }
+
+    .kullanici-bilgileri {
+      background-color: white;
+      border-left: 5px solid #fa5f1a;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .kullanici-bilgileri p {
+      margin: 5px 0;
+    }
+
+    button {
+      background-color: #4a3b2c;
+      color: white;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+
+    button:hover {
+      background-color: #3a2c20;
+    }
+  </style>
+</head>
+<body>
+
+  <h2 onclick="window.location.reload()">Admin Paneli</h2>
+
+  <label for="kullaniciSec">Kullanıcı E-postasını Seçin:</label>
+  <select id="kullaniciSec" onchange="kullaniciBilgileriniGoster()">
+    <option value="">-- Bir kullanıcı seçin --</option>
+  </select>
+
+  <div id="bilgiAlani" class="kullanici-bilgileri" style="display:none;"></div>
+
+  <div id="adminButonlar" style="display:none;">
+    <button id="gorevBtn">📌 Görevleri Görüntüle</button>
+    <button id="notBtn">📝 Notları Görüntüle</button>
+  </div>
+
+  <script>
+    const select = document.getElementById("kullaniciSec");
+    const bilgiAlani = document.getElementById("bilgiAlani");
+    const adminButonlar = document.getElementById("adminButonlar");
+    const kullanicilar = JSON.parse(localStorage.getItem("kullanicilar") || "[]");
+
+    // E-posta listesini doldur
+    kullanicilar.forEach(k => {
+      const option = document.createElement("option");
+      option.value = k.email;
+      option.textContent = k.email;
+      select.appendChild(option);
+    });
+
+    function kullaniciBilgileriniGoster() {
+      const seciliEmail = select.value;
+      const k = kullanicilar.find(u => u.email === seciliEmail);
+
+      if (k) {
+        bilgiAlani.style.display = "block";
+        bilgiAlani.innerHTML = `
+          <p><strong>Ad:</strong> ${k.ad || '-'}</p>
+          <p><strong>Soyad:</strong> ${k.soyad || '-'}</p>
+          <p><strong>Yaş:</strong> ${k.yas || '-'}</p>
+          <p><strong>Cinsiyet:</strong> ${k.cinsiyet || '-'}</p>
+          <p><strong>E-posta:</strong> ${k.email}</p>
+          <p><strong>Şifre:</strong> ${k.sifre}</p>
+        `;
+
+        adminButonlar.style.display = "block";
+
+        document.getElementById("gorevBtn").onclick = () => {
+          window.location.href = `gorevgoruntule.html?email=${encodeURIComponent(k.email)}`;
+        };
+
+        document.getElementById("notBtn").onclick = () => {
+          window.location.href = `notgoruntule.html?email=${encodeURIComponent(k.email)}`;
+        };
+      } else {
+        bilgiAlani.style.display = "none";
+        adminButonlar.style.display = "none";
+      }
+    }
+  </script>
+
+</body>
+</html>

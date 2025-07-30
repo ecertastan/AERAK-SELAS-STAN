@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Görev Düzenle - AERA</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #fffaf3;
+      margin: 0;
+      padding: 20px;
+      color: #4a3b2c;
+    }
+
+    h1 {
+      text-align: center;
+      color: #fa5f1a;
+    }
+
+    form {
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      font-size: 15px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-sizing: border-box;
+    }
+
+    .butonlar {
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    #guncelleBtn {
+      background-color: #4a3b2c;
+      color: white;
+    }
+
+    #silBtn {
+      background-color: #fa5f1a;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Görev Düzenle</h1>
+  <form id="duzenleForm">
+    <label>Görev Adı:</label>
+    <input type="text" id="ad" required>
+
+    <label>Saat:</label>
+    <input type="time" id="saat" required>
+
+    <label>Süre (dakika):</label>
+    <input type="number" id="sure" min="1" required>
+
+    <label>Tekrar:</label>
+    <select id="tekrar">
+      <option value="yok">Tek Seferlik</option>
+      <option value="gunluk">Günlük</option>
+      <option value="haftalik">Haftalık</option>
+    </select>
+
+    <label>Renk:</label>
+    <input type="color" id="renk">
+
+    <div class="butonlar">
+      <button type="button" id="guncelleBtn">Güncelle</button>
+      <button type="button" id="silBtn">Görevi Sil</button>
+    </div>
+  </form>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const gun = params.get("gun");
+    const ay = params.get("ay");
+    const yil = params.get("yil");
+    const id = params.get("id");
+    const seciliTarih = `${yil}-${ay.padStart(2, '0')}-${gun.padStart(2, '0')}`;
+    const aktifKullanici = localStorage.getItem("aktifKullanici");
+
+    const gorevler = JSON.parse(localStorage.getItem("gorevler") || "[]");
+    const gorevIndex = gorevler.findIndex(g => g.id === id && g.kullanici === aktifKullanici);
+
+    if (gorevIndex === -1) {
+      alert("Görev bulunamadı.");
+      window.location.href = "anasayfa.html";
+    }
+
+    const gorev = gorevler[gorevIndex];
+
+    document.getElementById("ad").value = gorev.ad;
+    document.getElementById("saat").value = gorev.saat;
+    document.getElementById("sure").value = gorev.sure;
+    document.getElementById("tekrar").value = gorev.tekrar;
+    document.getElementById("renk").value = gorev.renk;
+
+    document.getElementById("guncelleBtn").onclick = () => {
+      const yeniGorev = {
+        ...gorev,
+        ad: document.getElementById("ad").value.trim(),
+        saat: document.getElementById("saat").value,
+        sure: parseInt(document.getElementById("sure").value),
+        tekrar: document.getElementById("tekrar").value,
+        renk: document.getElementById("renk").value
+      };
+
+      if (gorev.tekrar !== yeniGorev.tekrar) {
+        for (let i = gorevler.length - 1; i >= 0; i--) {
+          if (gorevler[i].id.startsWith(gorev.id) && gorevler[i].id !== gorev.id) {
+            gorevler.splice(i, 1);
+          }
+        }
+
+        if (yeniGorev.tekrar === "gunluk") {
+          for (let i = 1; i <= 30; i++) {
+            const tarih = new Date(seciliTarih);
+            tarih.setDate(tarih.getDate() + i);
+            const y = tarih.getFullYear();
+            const a = (tarih.getMonth() + 1).toString().padStart(2, '0');
+            const g = tarih.getDate().toString().padStart(2, '0');
+            const yeniKopya = { ...yeniGorev };
+            yeniKopya.tarih = `${y}-${a}-${g}`;
+            yeniKopya.id = `${gorev.id}-copy${i}`;
+            gorevler.push(yeniKopya);
+          }
+        } else if (yeniGorev.tekrar === "haftalik") {
+          for (let i = 1; i <= 12; i++) {
+            const tarih = new Date(seciliTarih);
+            tarih.setDate(tarih.getDate() + 7 * i);
+            const y = tarih.getFullYear();
+            const a = (tarih.getMonth() + 1).toString().padStart(2, '0');
+            const g = tarih.getDate().toString().padStart(2, '0');
+            const yeniKopya = { ...yeniGorev };
+            yeniKopya.tarih = `${y}-${a}-${g}`;
+            yeniKopya.id = `${gorev.id}-copyW${i}`;
+            gorevler.push(yeniKopya);
+          }
+        }
+      }
+
+      gorevler[gorevIndex] = yeniGorev;
+      localStorage.setItem("gorevler", JSON.stringify(gorevler));
+      alert("Görev güncellendi.");
+      window.location.href = `anasayfa.html`;
+    };
+
+    document.getElementById("silBtn").onclick = () => {
+      if (confirm("Görevi silmek istediğine emin misin?")) {
+        const yeniGorevler = gorevler.filter(g => !g.id.startsWith(gorev.id));
+        localStorage.setItem("gorevler", JSON.stringify(yeniGorevler));
+        alert("Görev silindi.");
+        window.location.href = "anasayfa.html";
+      }
+    };
+  </script>
+
+</body>
+</html>

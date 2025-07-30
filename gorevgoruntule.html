@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Görevleri Görüntüle - AERA</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #fef9f4;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h2 {
+      color: #fa5f1a;
+    }
+
+    .gorev {
+      background-color: white;
+      border-left: 5px solid #fa5f1a;
+      padding: 10px;
+      margin-bottom: 12px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .gorev strong {
+      display: block;
+      font-size: 16px;
+      margin-bottom: 4px;
+    }
+
+    .geri-btn {
+      margin-top: 20px;
+      background-color: #4a3b2c;
+      color: white;
+      padding: 10px 18px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .geri-btn:hover {
+      background-color: #3a2c20;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Seçilen Kullanıcının Görevleri</h2>
+  <div id="gorevListesi"></div>
+
+  <button class="geri-btn" onclick="window.history.back()">← Geri</button>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const email = urlParams.get("email");
+
+    const gorevler = JSON.parse(localStorage.getItem("gorevler") || "[]");
+    const filtrelenmis = gorevler.filter(g => g.kullanici === email);
+
+    const liste = document.getElementById("gorevListesi");
+    if (filtrelenmis.length === 0) {
+      liste.innerHTML = "<p>Bu kullanıcıya ait görev bulunamadı.</p>";
+    } else {
+      filtrelenmis.forEach(g => {
+        const div = document.createElement("div");
+        div.className = "gorev";
+        div.innerHTML = `
+          <strong>${g.ad}</strong>
+          Tarih: ${g.tarih}<br>
+          Saat: ${g.saat}<br>
+          Süre: ${g.sure} dk<br>
+          Tekrar: ${g.tekrar}<br>
+        `;
+        liste.appendChild(div);
+      });
+    }
+  </script>
+
+</body>
+</html>

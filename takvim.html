@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Takvim - AERA</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #fef9f4;
+      color: #252525;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .takvim-ust {
+      width: 100%;
+      max-width: 700px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px;
+    }
+
+    .ay-yil {
+      font-size: 20px;
+      font-weight: bold;
+      color: #4a3b2c;
+      cursor: pointer;
+    }
+
+    .sec-btn {
+      background-color: #fa5f1a;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .sec-btn:hover {
+      background-color: #e0500f;
+    }
+
+    .takvim-kutu {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 10px;
+      padding: 0 20px 40px;
+      max-width: 700px;
+      width: 100%;
+    }
+
+    .gun-kutu {
+      background-color: white;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      height: 100px;
+      padding: 8px;
+      text-align: center;
+      font-size: 16px;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .gun-kutu.secili {
+      border: 2px solid #fa5f1a;
+      box-shadow: 0 0 6px rgba(250, 95, 26, 0.4);
+    }
+
+    .navigasyon {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .navigasyon button {
+      background-color: #4a3b2c;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .navigasyon button:hover {
+      background-color: #3a2c20;
+    }
+
+    select {
+      font-size: 16px;
+      padding: 4px;
+      margin-left: 5px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="takvim-ust">
+    <div class="navigasyon">
+      <button onclick="oncekiAy()">←</button>
+      <button onclick="sonrakiAy()">→</button>
+    </div>
+    <div class="ay-yil" onclick="ayYilSec()">
+      <span id="ayYilMetni"></span>
+    </div>
+    <button class="sec-btn" onclick="seciliGunuGoster()">Seç</button>
+  </div>
+
+  <div class="takvim-kutu" id="takvimKutu"></div>
+
+  <script>
+    const aylar = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
+    const gunler = ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"];
+
+    let seciliTarih = null;
+    let gosterilenAy = new Date().getMonth();
+    let gosterilenYil = new Date().getFullYear();
+
+    function guncelleTakvim() {
+      const container = document.getElementById("takvimKutu");
+      container.innerHTML = "";
+      document.getElementById("ayYilMetni").textContent = `${aylar[gosterilenAy]} ${gosterilenYil}`;
+
+      const ilkGun = new Date(gosterilenYil, gosterilenAy, 1).getDay();
+      const bosluk = (ilkGun + 6) % 7;
+      const toplamGun = new Date(gosterilenYil, gosterilenAy + 1, 0).getDate();
+
+      for (let i = 0; i < bosluk; i++) {
+        const div = document.createElement("div");
+        container.appendChild(div);
+      }
+
+      for (let gun = 1; gun <= toplamGun; gun++) {
+        const div = document.createElement("div");
+        div.className = "gun-kutu";
+        const ayStr = String(gosterilenAy + 1).padStart(2, "0");
+        const gunStr = String(gun).padStart(2, "0");
+        const tarihStr = `${gosterilenYil}-${ayStr}-${gunStr}`;
+        div.dataset.date = tarihStr;
+        div.innerHTML = `<strong>${gun}</strong>`;
+
+        div.addEventListener("click", () => {
+          document.querySelectorAll(".gun-kutu").forEach(k => k.classList.remove("secili"));
+          div.classList.add("secili");
+          seciliTarih = tarihStr;
+        });
+
+        div.addEventListener("dblclick", () => {
+          const [y, a, g] = tarihStr.split("-");
+          window.location.href = `gun.html?gun=${g}&ay=${a}&yil=${y}`;
+        });
+
+        container.appendChild(div);
+      }
+    }
+
+    function oncekiAy() {
+      gosterilenAy--;
+      if (gosterilenAy < 0) {
+        gosterilenAy = 11;
+        gosterilenYil--;
+      }
+      guncelleTakvim();
+    }
+
+    function sonrakiAy() {
+      gosterilenAy++;
+      if (gosterilenAy > 11) {
+        gosterilenAy = 0;
+        gosterilenYil++;
+      }
+      guncelleTakvim();
+    }
+
+    function ayYilSec() {
+      const yeniYil = prompt("Yıl giriniz:", gosterilenYil);
+      const yeniAy = prompt("Ay numarası (1-12):", gosterilenAy + 1);
+      if (yeniYil && yeniAy >= 1 && yeniAy <= 12) {
+        gosterilenYil = parseInt(yeniYil);
+        gosterilenAy = parseInt(yeniAy) - 1;
+        guncelleTakvim();
+      }
+    }
+
+    function seciliGunuGoster() {
+      if (!seciliTarih) {
+        alert("Lütfen bir gün seçin!");
+        return;
+      }
+      localStorage.setItem("seciliTarihIndex", seciliTarih);
+      window.location.href = "anasayfa.html"; // <-- DEĞİŞTİRİLDİ
+    }
+
+    guncelleTakvim();
+  </script>
+
+</body>
+</html>
