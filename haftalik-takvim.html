@@ -1,0 +1,203 @@
+
+<!DOCTYPE html>
+
+<html lang="tr">
+<head>
+<meta charset="utf-8"/>
+<title>Haftalık Takvim - AERA</title>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #fef9f4;
+      color: #252525;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      color: #fa5f1a;
+      margin-top: 20px;
+    }
+
+    .navigasyon {
+      margin: 20px;
+      display: flex;
+      gap: 20px;
+    }
+
+    .navigasyon button {
+      background-color: #4a3b2c;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .navigasyon button:hover {
+      background-color: #3a2c20;
+    }
+
+    .haftalik-gosterge {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      padding: 10px;
+      flex-wrap: wrap;
+    }
+
+    .gun-kutu {
+      background-color: white;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      width: 110px;
+      height: auto;
+      padding: 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+    }
+
+    .gun-kutu.secili {
+      border: 2px solid #fa5f1a;
+      box-shadow: 0 0 6px rgba(250, 95, 26, 0.4);
+    }
+
+    .gorev {
+      margin-top: 6px;
+      font-size: 12px;
+      border-radius: 5px;
+      padding: 2px 4px;
+      color: white;
+    }
+  
+    .haftalik-gosterge {
+      display: flex;
+      justify-content: flex-start;
+      gap: 10px;
+      padding: 10px;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .gun-kutu {
+      background-color: white;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      width: 120px;
+      min-height: 480px;
+      padding: 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+      flex-shrink: 0;
+      box-sizing: border-box;
+      overflow-y: auto;
+    }
+
+    .gun-kutu strong {
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .gorev {
+      margin-top: 6px;
+      font-size: 12px;
+      border-radius: 5px;
+      padding: 2px 4px;
+      color: white;
+      word-break: break-word;
+    }
+    </style>
+</head>
+<body>
+<h1>Haftalık Takvim</h1>
+<div class="navigasyon">
+<button onclick="oncekiHafta()">← Önceki</button>
+<button onclick="sonrakiHafta()">Sonraki →</button>
+</div>
+<div class="haftalik-gosterge" id="haftaGosterge"></div>
+<script>
+    const haftaGosterge = document.getElementById("haftaGosterge");
+    let seciliGun = null;
+    let sonTiklama = 0;
+
+    let tarih = new Date();
+    tarih.setHours(0, 0, 0, 0);
+
+    function tarihYaz(date) {
+      return date.toLocaleDateString("tr-TR", { day: 'numeric', month: 'long', weekday: 'long' });
+    }
+
+    function tarihISO(date) {
+      return date.toISOString().split("T")[0];
+    }
+
+    function gorevleriYukle() {
+      return JSON.parse(localStorage.getItem("gorevler") || "[]").filter(g => g.kullanici === localStorage.getItem("aktifKullanici"));
+    }
+
+    function haftayiGoster() {
+      haftaGosterge.innerHTML = "";
+      const gun = tarih.getDay() === 0 ? 6 : tarih.getDay() - 1;
+      const baslangic = new Date(tarih);
+      baslangic.setDate(tarih.getDate() - gun);
+
+      const gorevler = gorevleriYukle();
+
+      for (let i = 0; i < 7; i++) {
+        const gunTarihi = new Date(baslangic);
+        gunTarihi.setDate(baslangic.getDate() + i);
+        const gunISO = tarihISO(gunTarihi);
+
+        const kutu = document.createElement("div");
+        kutu.className = "gun-kutu";
+        kutu.dataset.tarih = gunISO;
+        kutu.innerHTML = "<strong>" + tarihYaz(gunTarihi) + "</strong>";
+
+        const gunGorevler = gorevler.filter(g => g.tarih === gunISO);
+        gunGorevler.forEach(g => {
+          const gDiv = document.createElement("div");
+          gDiv.className = "gorev";
+          gDiv.style.backgroundColor = g.renk;
+          gDiv.textContent = g.ad;
+          kutu.appendChild(gDiv);
+        });
+
+        kutu.addEventListener("click", () => {
+          const simdi = new Date().getTime();
+          if (seciliGun === gunISO && simdi - sonTiklama < 1000) {
+            const [y, m, d] = gunISO.split("-");
+            window.location.href = `gun.html?gun=${d}&ay=${m}&yil=${y}`;
+          } else {
+            document.querySelectorAll(".gun-kutu").forEach(k => k.classList.remove("secili"));
+            kutu.classList.add("secili");
+            seciliGun = gunISO;
+          }
+          sonTiklama = simdi;
+        });
+
+        haftaGosterge.appendChild(kutu);
+      }
+    }
+
+    function oncekiHafta() {
+      tarih.setDate(tarih.getDate() - 7);
+      haftayiGoster();
+    }
+
+    function sonrakiHafta() {
+      tarih.setDate(tarih.getDate() + 7);
+      haftayiGoster();
+    }
+
+    haftayiGoster();
+  </script>
+</body>
+</html>
