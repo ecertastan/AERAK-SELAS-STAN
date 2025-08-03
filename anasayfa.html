@@ -83,34 +83,35 @@
   <div class="buton-container">
     <button onclick="window.location.href='takvim.html'">Takvim</button>
     <button onclick="window.location.href='haftalik-takvim.html'">Haftalık Takvim</button>
-    <button onclick="window.location.href='notoku.html'">Not Oku</button>
   </div>
 
   <script>
-    // Bugünün tarihini al
+    // Aynı tarih format fonksiyonu
+    function tarihISO(date) {
+      return date.toISOString().split("T")[0];
+    }
+
     const bugun = new Date();
-    const gun = bugun.getDate().toString().padStart(2, '0');
-    const ay = (bugun.getMonth() + 1).toString().padStart(2, '0');
-    const yil = bugun.getFullYear();
-    const tarihStr = `${gun}.${ay}.${yil}`;
+    bugun.setHours(0, 0, 0, 0); // Gün saatlerini sıfırla
+    const bugunISO = tarihISO(bugun);
 
-    document.getElementById("bugunTarihi").innerText = `Bugün: ${tarihStr}`;
+    document.getElementById("bugunTarihi").innerText =
+      "Bugün: " + bugun.toLocaleDateString("tr-TR", { day: 'numeric', month: 'long', year: 'numeric', weekday: 'long' });
 
-    // Görevleri yükle
     const aktifKullanici = localStorage.getItem("aktifKullanici");
-    const tumGorevler = JSON.parse(localStorage.getItem("gorevler")) || [];
+    const tumGorevler = JSON.parse(localStorage.getItem("gorevler") || "[]");
 
-    const bugunGorevler = tumGorevler.filter(g => g.kullanici === aktifKullanici && g.tarih === tarihStr);
+    const bugunGorevler = tumGorevler.filter(g => g.kullanici === aktifKullanici && g.tarih === bugunISO);
 
     const gorevListesiDiv = document.getElementById("gorevListesi");
 
     if (bugunGorevler.length === 0) {
       gorevListesiDiv.innerHTML = "<em>Bugün için görev bulunamadı.</em>";
     } else {
-      bugunGorevler.forEach(gorev => {
+      bugunGorevler.forEach(g => {
         const div = document.createElement("div");
         div.className = "gorev";
-        div.innerText = `${gorev.saat} - ${gorev.ad}`;
+        div.innerText = `${g.saat} - ${g.ad}`;
         gorevListesiDiv.appendChild(div);
       });
     }
