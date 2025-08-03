@@ -55,12 +55,24 @@
     .butonlar button:hover {
       background-color: #3a2c20;
     }
+
+    select {
+      display: block;
+      margin: 0 auto 20px auto;
+      padding: 10px;
+      font-size: 16px;
+    }
   </style>
 </head>
 <body>
 
   <h1>AERA Not</h1>
   <div id="tarih"></div>
+
+  <div id="tarihSeciciKapsayici" style="display:none;">
+    <select id="tarihSecici"></select>
+  </div>
+
   <div id="notMetni">Yükleniyor...</div>
 
   <div class="butonlar">
@@ -70,37 +82,76 @@
 
   <script>
     const params = new URLSearchParams(window.location.search);
-    const gun = params.get("gun");
-    const ay = params.get("ay");
-    const yil = params.get("yil");
-    const seciliTarih = `${yil}-${ay.padStart(2, '0')}-${gun.padStart(2, '0')}`;
+    const kaynak = params.get("kaynak");
     const aktifKullanici = localStorage.getItem("aktifKullanici");
-
-    const tarihMetni = new Date(seciliTarih).toLocaleDateString("tr-TR", { day: 'numeric', month: 'long', year: 'numeric' });
-    document.getElementById("tarih").textContent = tarihMetni;
-
     const notlar = JSON.parse(localStorage.getItem("notlar") || "[]");
-    const notObj = notlar.find(n => n.tarih === seciliTarih && n.kullanici === aktifKullanici);
-
     const notMetni = document.getElementById("notMetni");
-    if (notObj) {
-      notMetni.textContent = notObj.metin;
-    } else {
-      notMetni.textContent = "Bu tarih için not bulunamadı.";
-      document.getElementById("silBtn").style.display = "none";
-      document.getElementById("duzenleBtn").style.display = "none";
+    const tarihDiv = document.getElementById("tarih");
+    const silBtn = document.getElementById("silBtn");
+    const duzenleBtn = document.getElementById("duzenleBtn");
+
+    function gosterNot(tarihStr) {
+      const [yil, ay, gun] = tarihStr.split("-");
+      const tarihMetni = new Date(tarihStr).toLocaleDateString("tr-TR", { day: 'numeric', month: 'long', year: 'numeric' });
+      tarihDiv.textContent = tarihMetni;
+
+      const notObj = notlar.find(n => n.tarih === tarihStr && n.kullanici === aktifKullanici);
+      if (notObj) {
+        notMetni.textContent = notObj.metin;
+        silBtn.style.display = "inline-block";
+        duzenleBtn.style.display = "inline-block";
+
+        silBtn.onclick = () => {
+          const guncelNotlar = notlar.filter(n => !(n.tarih === tarihStr && n.kullanici === aktifKullanici));
+          localStorage.setItem("notlar", JSON.stringify(guncelNotlar));
+          alert("Not silindi.");
+          window.location.href = `not-ekle.html?gun=${gun}&ay=${ay}&yil=${yil}`;
+        };
+
+        duzenleBtn.onclick = () => {
+          window.location.href = `not-ekle.html?gun=${gun}&ay=${ay}&yil=${yil}`;
+        };
+      } else {
+        notMetni.textContent = "Bu tarih için not bulunamadı.";
+        silBtn.style.display = "none";
+        duzenleBtn.style.display = "none";
+      }
     }
 
-    document.getElementById("silBtn").onclick = () => {
-      const guncelNotlar = notlar.filter(n => !(n.tarih === seciliTarih && n.kullanici === aktifKullanici));
-      localStorage.setItem("notlar", JSON.stringify(guncelNotlar));
-      alert("Not silindi.");
-      window.location.href = `not-ekle.html?gun=${gun}&ay=${ay}&yil=${yil}`;
-    };
+    if (kaynak === "anasayfa") {
+      // Scroll ile tarih seçtir
+      const tarihSecici = document.getElementById("tarihSecici");
+      const tarihSeciciKapsayici = document.getElementById("tarihSeciciKapsayici");
+      tarihSeciciKapsayici.style.display = "block";
 
-    document.getElementById("duzenleBtn").onclick = () => {
-      window.location.href = `not-ekle.html?gun=${gun}&ay=${ay}&yil=${yil}`;
-    };
+      const kullaniciNotlari = notlar.filter(n => n.kullanici === aktifKullanici);
+      kullaniciNotlari.forEach(n => {
+        const option = document.createElement("option");
+        option.value = n.tarih;
+        const [y, m, d] = n.tarih.split("-");
+        option.textContent = new Date(n.tarih).toLocaleDateString("tr-TR", { day: 'numeric', month: 'long', year: 'numeric' });
+        tarihSecici.appendChild(option);
+      });
+
+      if (kullaniciNotlari.length > 0) {
+        tarihSecici.onchange = () => gosterNot(tarihSecici.value);
+        tarihSecici.value = kullaniciNotlari[0].tarih;
+        gosterNot(tarihSecici.value);
+      } else {
+        tarihDiv.textContent = "Hiç not bulunamadı.";
+        notMetni.textContent = "";
+        silBtn.style.display = "none";
+        duzenleBtn.style.display = "none";
+      }
+
+    } else {
+      // Doğrudan gün.html'den gelen yapı
+      const gun = params.get("gun");
+      const ay = params.get("ay");
+      const yil = params.get("yil");
+      const seciliTarih = `${yil}-${ay.padStart(2, '0')}-${gun.padStart(2, '0')}`;
+      gosterNot(seciliTarih);
+    }
   </script>
 
 </body>
