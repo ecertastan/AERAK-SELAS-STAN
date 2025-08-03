@@ -48,6 +48,16 @@
     button:hover {
       background-color: #3a2c20;
     }
+
+    #sifirlaBtn {
+      margin-top: 40px;
+      background-color: darkred;
+      color: white;
+    }
+
+    #sifirlaBtn:hover {
+      background-color: #b30000;
+    }
   </style>
 </head>
 <body>
@@ -65,6 +75,9 @@
     <button id="gorevBtn">📌 Görevleri Görüntüle</button>
     <button id="notBtn">📝 Notları Görüntüle</button>
   </div>
+
+  <!-- Sıfırla Butonu -->
+  <button id="sifirlaBtn" onclick="localStorageSifirla()">🚨 Tüm Verileri SIFIRLA</button>
 
   <script>
     const select = document.getElementById("kullaniciSec");
@@ -107,6 +120,16 @@
       } else {
         bilgiAlani.style.display = "none";
         adminButonlar.style.display = "none";
+      }
+    }
+
+    // LocalStorage sıfırlama fonksiyonu
+    function localStorageSifirla() {
+      const onay = confirm("Tüm verileri silmek istediğinizden emin misiniz? Bu işlem geri alınamaz!");
+      if (onay) {
+        localStorage.clear();
+        alert("Tüm veriler başarıyla silindi.");
+        location.reload();
       }
     }
   </script>
