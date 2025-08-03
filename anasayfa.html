@@ -1,287 +1,120 @@
 <!DOCTYPE html>
-
 <html lang="tr">
 <head>
-<meta charset="utf-8"/>
-<title>AERA - Ana Sayfa</title>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AERA</title>
+  <style>
     body {
-      max-width: 500px;
-      margin: 0 auto;
       margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #fef9f4;
-      color: #252525;
+      padding: 20px;
+      background-color: #fdf6e3;
+      font-family: Arial, sans-serif;
       display: flex;
       flex-direction: column;
-      align-items: center;
+      min-height: 100vh;
+      box-sizing: border-box;
     }
+
     h1 {
-      margin-top: 30px;
-      font-size: 32px;
-      color: #fa5f1a;
-      cursor: pointer;
-    }
-    .xp-container {
-      width: 80%;
-      margin-top: 20px;
-    }
-    .xp-info {
-      display: flex;
-      justify-content: space-between;
-      font-size: 14px;
-      margin-bottom: 4px;
-    }
-    .xp-bar-outer {
-      width: 100%;
-      height: 16px;
-      background-color: #ddd;
-      border-radius: 10px;
-      overflow: hidden;
-    }
-    .xp-bar-inner {
-      height: 100%;
-      width: 0%;
-      background-color: #6b4f3b;
-      transition: width 0.5s;
-    }
-    .ay-goster {
-      font-size: 20px;
-      margin: 25px 0 0 0;
-      font-weight: bold;
-      color: #4a3b2c;
-    }
-    .haftalik-takvim-container {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      margin: 20px 0;
-    }
-    .haftalik-takvim {
-      display: flex;
-      gap: 10px;
-      transition: transform 0.4s ease-in-out;
-    }
-    .takvim-gunu {
-      background-color: white;
-      border-radius: 10px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      padding: 10px;
       text-align: center;
-      width: 70px;
-      height: 240px;
-      font-size: 16px;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      align-items: center;
+      font-size: 32px;
+      color: #333;
+      margin: 0;
+      margin-bottom: 10px;
     }
-    .takvim-gunu strong {
-      margin-bottom: 6px;
-    }
-    .takvim-gunu.secili {
-      border: 2px solid #fa5f1a;
-      box-shadow: 0 0 6px rgba(250, 95, 26, 0.4);
-    }
-    .hafta-navigasyon {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .hafta-navigasyon button {
-      background-color: #4a3b2c;
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 35px;
-      height: 35px;
+
+    #bugunTarihi {
+      text-align: center;
       font-size: 18px;
-      cursor: pointer;
-      transition: background-color 0.2s;
+      margin-bottom: 20px;
+      color: #555;
     }
-    .hafta-navigasyon button:hover {
-      background-color: #3a2c20;
+
+    #gorevler {
+      width: 100%;
+      max-width: 500px;
+      margin: 0 auto 20px auto;
+      background-color: #fff;
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-    .alt-butonlar {
-      margin-top: 20px;
+
+    .gorev {
+      background-color: #eee;
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 10px;
     }
-    .alt-butonlar button {
-      padding: 12px 20px;
-      background-color: #4a3b2c;
+
+    .buton-container {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .buton-container button {
+      padding: 12px 18px;
+      font-size: 16px;
       border: none;
       border-radius: 8px;
+      background-color: #333;
       color: white;
-      font-size: 15px;
       cursor: pointer;
-      transition: background-color 0.2s;
     }
-    .alt-butonlar button:hover {
-      background-color: #3a2c20;
+
+    .buton-container button:hover {
+      background-color: #555;
     }
   </style>
 </head>
 <body>
-<h1 onclick="window.location.href='anasayfa.html'">AERA</h1>
-<div class="xp-container">
-<div class="xp-info">
-<span>Seviye: <span id="level">0</span></span>
-<span><span id="xpDisplay">0</span> XP</span>
-</div>
-<div class="xp-bar-outer">
-<div class="xp-bar-inner" id="xpBar"></div>
-</div>
-</div>
-<div class="ay-goster" id="ayGoster"></div>
 
-<div class="alt-butonlar" style="position: fixed; bottom: 0; left: 0; right: 0; background: #fffaf3; padding: 10px; display: flex; justify-content: center; gap: 15px;"><button onclick="window.location.href='takvim.html'">📅 Takvim</button><button onclick="window.location.href='haftalik-takvim.html'">🗓️ Haftalık Takvim</button></div>
-<script>
-    let xp = parseInt(localStorage.getItem("xp")) || 0;
-    let level = 0;
-    let xpToNext = 100;
+  <h1>AERA</h1>
+  <div id="bugunTarihi"></div>
 
-    function updateXPUI() {
-      document.getElementById("xpDisplay").textContent = xp;
-      document.getElementById("level").textContent = level;
-      const percent = (xp / xpToNext) * 100;
-      document.getElementById("xpBar").style.width = percent + "%";
-    }
+  <div id="gorevler">
+    <strong>Bugünün Görevleri:</strong>
+    <div id="gorevListesi"></div>
+  </div>
 
-    function checkLevelUp() {
-      while (xp >= xpToNext) {
-        xp -= xpToNext;
-        level++;
-        xpToNext = Math.floor(xpToNext * 1.1);
-      }
-      localStorage.setItem("xp", xp);
-      updateXPUI();
-    }
+  <div class="buton-container">
+    <button onclick="window.location.href='takvim.html'">Takvim</button>
+    <button onclick="window.location.href='haftalik-takvim.html'">Haftalık Takvim</button>
+    <button onclick="window.location.href='notoku.html'">Not Oku</button>
+  </div>
 
-    const haftaTakvimi = document.getElementById("haftaTakvimi");
-    const ayGoster = document.getElementById("ayGoster");
+  <script>
+    // Bugünün tarihini al
+    const bugun = new Date();
+    const gun = bugun.getDate().toString().padStart(2, '0');
+    const ay = (bugun.getMonth() + 1).toString().padStart(2, '0');
+    const yil = bugun.getFullYear();
+    const tarihStr = `${gun}.${ay}.${yil}`;
 
-    let secilenTarih;
-    const kayitliTarih = localStorage.getItem("seciliTarihIndex");
-    if (kayitliTarih) {
-      const [yil, ay, gun] = kayitliTarih.split("-");
-      secilenTarih = new Date(parseInt(yil), parseInt(ay) - 1, parseInt(gun));
-      localStorage.removeItem("seciliTarihIndex");
+    document.getElementById("bugunTarihi").innerText = `Bugün: ${tarihStr}`;
+
+    // Görevleri yükle
+    const aktifKullanici = localStorage.getItem("aktifKullanici");
+    const tumGorevler = JSON.parse(localStorage.getItem("gorevler")) || [];
+
+    const bugunGorevler = tumGorevler.filter(g => g.kullanici === aktifKullanici && g.tarih === tarihStr);
+
+    const gorevListesiDiv = document.getElementById("gorevListesi");
+
+    if (bugunGorevler.length === 0) {
+      gorevListesiDiv.innerHTML = "<em>Bugün için görev bulunamadı.</em>";
     } else {
-      secilenTarih = new Date();
-    }
-
-    let seciliGun = null;
-    let sonTiklamaZamani = 0;
-
-    const aylar = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
-
-    function haftayiGoster(tarih) {
-      haftaTakvimi.innerHTML = "";
-      const gunler = ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"];
-      const gun = tarih.getDay() === 0 ? 6 : tarih.getDay() - 1;
-      const baslangic = new Date(tarih.getFullYear(), tarih.getMonth(), tarih.getDate() - gun);
-
-      ayGoster.textContent = `${aylar[baslangic.getMonth()]} ${baslangic.getFullYear()}`;
-
-      const aktifKullanici = localStorage.getItem("aktifKullanici");
-      const tumGorevler = JSON.parse(localStorage.getItem("gorevler") || "[]");
-      const gorevler = tumGorevler.filter(g => g.kullanici === aktifKullanici);
-
-      for (let i = 0; i < 7; i++) {
-        const gunTarihi = new Date(baslangic.getFullYear(), baslangic.getMonth(), baslangic.getDate() + i);
-        const yil = gunTarihi.getFullYear();
-        const ay = (gunTarihi.getMonth() + 1).toString().padStart(2, '0');
-        const gun = gunTarihi.getDate().toString().padStart(2, '0');
-        const tarihStr = `${yil}-${ay}-${gun}`;
-
+      bugunGorevler.forEach(gorev => {
         const div = document.createElement("div");
-        div.className = "takvim-gunu";
-        div.dataset.date = tarihStr;
-
-        const bugun = new Date();
-        if (
-          gunTarihi.getDate() === bugun.getDate() &&
-          gunTarihi.getMonth() === bugun.getMonth() &&
-          gunTarihi.getFullYear() === bugun.getFullYear()
-        ) {
-          div.style.backgroundColor = "#ffe9cc";
-        }
-
-        div.innerHTML = `<strong>${gunler[i]}</strong><br>${gunTarihi.getDate()}`;
-
-        const gunGorevleri = gorevler.filter(g => g.tarih === tarihStr);
-        gunGorevleri.forEach(g => {
-          const gDiv = document.createElement("div");
-          gDiv.style.backgroundColor = g.renk;
-          gDiv.style.color = "#fff";
-          gDiv.style.borderRadius = "5px";
-          gDiv.style.padding = "2px 4px";
-          gDiv.style.marginTop = "5px";
-          gDiv.style.fontSize = "12px";
-          gDiv.textContent = g.ad;
-          div.appendChild(gDiv);
-        });
-
-        div.addEventListener("click", () => {
-          const simdi = new Date().getTime();
-          const tiklananGun = div.dataset.date;
-
-          if (tiklananGun === seciliGun && simdi - sonTiklamaZamani < 1000) {
-            const [yil, ay, gun] = tiklananGun.split("-");
-            window.location.href = `gun.html?gun=${gun}&ay=${ay}&yil=${yil}`;
-          } else {
-            const secililer = document.querySelectorAll(".takvim-gunu.secili");
-            secililer.forEach(g => g.classList.remove("secili"));
-            if (tiklananGun !== seciliGun) {
-              div.classList.add("secili");
-              seciliGun = tiklananGun;
-            } else {
-              seciliGun = null;
-            }
-          }
-          sonTiklamaZamani = simdi;
-        });
-
-        haftaTakvimi.appendChild(div);
-      }
+        div.className = "gorev";
+        div.innerText = `${gorev.saat} - ${gorev.ad}`;
+        gorevListesiDiv.appendChild(div);
+      });
     }
-
-    function oncekiHafta() {
-      secilenTarih.setDate(secilenTarih.getDate() - 7);
-      haftayiGoster(secilenTarih);
-    }
-
-    function sonrakiHafta() {
-      secilenTarih.setDate(secilenTarih.getDate() + 7);
-      haftayiGoster(secilenTarih);
-    }
-
-    checkLevelUp();
-    haftayiGoster(secilenTarih);
   </script>
-<div id="animasyonKutusu" style="width: 90%; max-width: 360px; height: 240px; margin: 40px auto; border: 2px solid #ccc; border-radius: 12px; overflow: hidden;"><iframe frameborder="0" height="100%" id="animasyonIframe" src="" width="100%"></iframe></div><script>
-let xp = parseInt(localStorage.getItem("xp")) || 0;
-let level = 0;
-let xpToNext = 100;
 
-function updateXPUI() {
-  document.getElementById("xpDisplay").textContent = xp;
-  document.getElementById("level").textContent = level;
-  const percent = (xp / xpToNext) * 100;
-  document.getElementById("xpBar").style.width = percent + "%";
-}
-
-function checkLevelUp() {
-  while (xp >= xpToNext) {
-    xp -= xpToNext;
-    level++;
-    xpToNext = Math.floor(xpToNext * 1.1);
-  }
-  localStorage.setItem("xp", xp);
-  updateXPUI();
-  document.getElementById("animasyonIframe").src = `animasyon-seviye${level}.html`;
-}
-
-checkLevelUp();
-</script></body>
+</body>
 </html>
